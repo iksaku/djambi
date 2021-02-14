@@ -1,6 +1,8 @@
-export enum Player {
-  Red,
-  Blue,
-  Green,
-  Yellow,
-}
+export type PlayerTeam = keyof typeof PlayerTeam
+
+export const PlayerTeam = {
+  Green: 'Green',
+  Yellow: 'Yellow',
+  Red: 'Red',
+  Blue: 'Blue',
+} as const

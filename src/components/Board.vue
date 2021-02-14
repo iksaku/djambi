@@ -1,7 +1,7 @@
 <template>
   <div class="max-w-xl mx-auto">
     <div class="grid grid-cols-9 grid-rows-9 gap-0 border border-black">
-      <template v-for="[y, row] of getBoard()" :key="y">
+      <template v-for="[y, row] of board.map" :key="y">
         <!-- Square -->
         <Square v-for="[x] of row" :key="x" :coordinates="{ x, y }" />
       </template>
@@ -11,7 +11,7 @@
 
 <script lang="ts">
   import { defineComponent, onMounted } from 'vue'
-  import { getBoard, generateBoard } from '@/api/board'
+  import board from '@/api/board'
 
   import Square from '@/components/Square.vue'
 
@@ -24,11 +24,11 @@
 
     setup() {
       onMounted(() => {
-        generateBoard()
+        board.generate()
       })
 
       return {
-        getBoard,
+        board,
       }
     },
   })
