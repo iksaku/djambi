@@ -1,11 +1,18 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
+  <div class="w-full min-h-screen h-full">
+    <Board />
+  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+  import { defineComponent } from 'vue'
 
-export default defineComponent({
-  name: 'App',
-})
+  import Board from '@/components/Board.vue'
+
+  export default defineComponent({
+    name: 'App',
+    components: {
+      Board,
+    },
+  })
 </script>
