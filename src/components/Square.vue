@@ -19,6 +19,7 @@
 <script lang="ts">
   import { computed, defineComponent } from 'vue'
   import board from '@/api/board'
+  import { MazeCoordinates } from '@/api/coordinates'
 
   type Props = {
     coordinates: {
@@ -38,7 +39,11 @@
     } as Props,
 
     setup({ coordinates }: Props) {
-      const isMaze = computed(() => coordinates.x === 4 && coordinates.y === 4)
+      const isMaze = computed(
+        () =>
+          coordinates.x === MazeCoordinates.x &&
+          coordinates.y === MazeCoordinates.y
+      )
       const piece = computed(() => board.getPieceAt(coordinates))
 
       return {

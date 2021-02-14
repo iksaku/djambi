@@ -1,4 +1,5 @@
-import type { PlayerTeam } from '@/api/player'
+import type { Player } from '@/api/player'
+import board from '@/api/board'
 
 export type PieceType = keyof typeof PieceType
 
@@ -12,18 +13,18 @@ export const PieceType = {
 } as const
 
 export class Piece {
-  public isAlive: boolean = false
+  public isAlive: boolean = true
 
   public constructor(
-    public readonly owner: PlayerTeam,
+    public readonly owner: Player,
     public readonly type: PieceType
   ) {}
 
-  public get component() {
+  public get component(): string {
     return `piece-${this.type.toLowerCase()}`
   }
 
-  public get color() {
+  public get color(): string {
     const colors = {
       Green: 'text-green-500',
       Yellow: 'text-yellow-500',
@@ -34,7 +35,11 @@ export class Piece {
     return colors[this.owner] ?? undefined
   }
 
-  public get canKillDirectly() {
+  public get isCorpse(): boolean {
+    return !this.isAlive
+  }
+
+  public get canKillDirectly(): boolean {
     return (
       this.type !== PieceType.Diplomat &&
       this.type !== PieceType.Necromobile &&
@@ -42,15 +47,22 @@ export class Piece {
     )
   }
 
-  public get canMovePiece() {
+  public get canMovePiece(): boolean {
     return this.type === PieceType.Diplomat
   }
 
-  public get canMoveCorpse() {
+  public get canMoveCorpse(): boolean {
     return this.type === PieceType.Necromobile
   }
 
-  public get canEnterMaze() {
+  public get canEnterMaze(): boolean {
     return this.type === PieceType.Chief || !this.isAlive
+  }
+
+  public canBeUsedByPlayer(player: Player): boolean {
+    return (
+      (this.isAlive && player === this.owner) ||
+      (this.isCorpse && player === board.playerInPower)
+    )
   }
 }

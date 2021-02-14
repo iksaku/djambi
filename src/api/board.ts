@@ -1,7 +1,11 @@
 import { reactive } from 'vue'
-import { Coordinates, validateCoordinates } from '@/api/coordinates'
+import {
+  Coordinates,
+  MazeCoordinates,
+  ValidateCoordinates,
+} from '@/api/coordinates'
 import { Piece, PieceType } from '@/api/piece'
-import { PlayerTeam } from '@/api/player'
+import { Player } from '@/api/player'
 
 type BoardMap = Map<number, Map<number, Piece | undefined>>
 
@@ -30,9 +34,9 @@ class Board {
       [PieceType.Militant, PieceType.Militant, PieceType.Necromobile],
     ]
 
-    for (let p of Object.values(PlayerTeam)) {
-      const inUpperRegion = p === PlayerTeam.Green || p === PlayerTeam.Yellow
-      const inLeftRegion = p === PlayerTeam.Green || p === PlayerTeam.Red
+    for (let p of Object.values(Player)) {
+      const inUpperRegion = p === Player.Green || p === Player.Yellow
+      const inLeftRegion = p === Player.Green || p === Player.Red
 
       let xStart = inLeftRegion ? 0 : 8
       let yStart = inUpperRegion ? 0 : 8
@@ -56,19 +60,27 @@ class Board {
   }
 
   public getPieceAt(coordinates: Coordinates): Piece | undefined {
-    validateCoordinates(coordinates)
+    ValidateCoordinates(coordinates)
 
     return this.map.get(coordinates.y)?.get(coordinates.x) ?? undefined
   }
 
   public setPieceAt(coordinates: Coordinates, piece?: Piece): void {
-    validateCoordinates(coordinates)
+    ValidateCoordinates(coordinates)
 
     if (!this.map.get(coordinates.y)) {
       this.map.set(coordinates.y, new Map())
     }
 
     this.map.get(coordinates.y)?.set(coordinates.x, piece)
+  }
+
+  public removePieceFrom(coordinates: Coordinates): void {
+    this.setPieceAt(coordinates, undefined)
+  }
+
+  public get playerInPower(): Player | undefined {
+    return this.getPieceAt(MazeCoordinates)?.owner ?? undefined
   }
 }
 

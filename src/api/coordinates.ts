@@ -3,7 +3,12 @@ export type Coordinates = {
   y: number
 }
 
-export function validateCoordinates(coordinate: Coordinates): void {
+export const MazeCoordinates: Coordinates = {
+  x: 4,
+  y: 4,
+} as const
+
+export function ValidateCoordinates(coordinate: Coordinates): void {
   if (coordinate.x < 0 || coordinate.x >= 9) {
     throw 'Invalid X coordinate'
   }

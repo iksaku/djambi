@@ -1,6 +1,6 @@
-export type PlayerTeam = keyof typeof PlayerTeam
+export type Player = keyof typeof Player
 
-export const PlayerTeam = {
+export const Player = {
   Green: 'Green',
   Yellow: 'Yellow',
   Red: 'Red',
