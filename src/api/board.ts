@@ -4,7 +4,15 @@ import {
   MazeCoordinates,
   ValidateCoordinates,
 } from '@/api/coordinates'
-import { Piece, PieceType } from '@/api/piece'
+import {
+  Piece,
+  Assassin,
+  Chief,
+  Diplomat,
+  Militant,
+  Necromobile,
+  Reporter,
+} from '@/api/piece'
 import { Player } from '@/api/player'
 
 type BoardMap = Map<number, Map<number, Piece | undefined>>
@@ -27,11 +35,11 @@ class Board {
 
     const pieceDistribution = [
       // First Row
-      [PieceType.Chief, PieceType.Assassin, PieceType.Militant],
+      [Chief, Assassin, Militant],
       // Second Row
-      [PieceType.Reporter, PieceType.Diplomat, PieceType.Militant],
+      [Reporter, Diplomat, Militant],
       // Third Row,
-      [PieceType.Militant, PieceType.Militant, PieceType.Necromobile],
+      [Militant, Militant, Necromobile],
     ]
 
     for (let p of Object.values(Player)) {
@@ -53,7 +61,7 @@ class Board {
 
           if (!pieceType) continue
 
-          this.setPieceAt({ x, y }, new Piece(p, pieceType))
+          this.setPieceAt({ x, y }, new pieceType(p))
         }
       }
     }

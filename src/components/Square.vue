@@ -7,11 +7,7 @@
     <div
       class="absolute inset-0 flex items-center justify-center transform duration-1000 ease-in"
     >
-      <component
-        v-if="piece"
-        :is="`piece-${piece.type.toLowerCase()}`"
-        :class="piece.color"
-      />
+      <component v-if="piece" :is="piece.component" :class="piece.color" />
     </div>
   </div>
 </template>
@@ -20,6 +16,7 @@
   import { computed, defineComponent } from 'vue'
   import board from '@/api/board'
   import { MazeCoordinates } from '@/api/coordinates'
+  import { Piece } from '@/api/piece'
 
   type Props = {
     coordinates: {
@@ -40,11 +37,13 @@
 
     setup({ coordinates }: Props) {
       const isMaze = computed(
-        () =>
+        (): boolean =>
           coordinates.x === MazeCoordinates.x &&
           coordinates.y === MazeCoordinates.y
       )
-      const piece = computed(() => board.getPieceAt(coordinates))
+      const piece = computed((): Piece | undefined =>
+        board.getPieceAt(coordinates)
+      )
 
       return {
         isMaze,
