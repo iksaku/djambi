@@ -1,10 +1,19 @@
 <template>
   <div class="max-w-xl mx-auto">
     <div class="grid grid-cols-9 grid-rows-9 gap-0 border border-black">
-      <template v-for="[y, row] of board.map" :key="y">
-        <!-- Square -->
-        <Square v-for="[x] of row" :key="x" :coordinates="{ x, y }" />
+      <!-- Board Squares -->
+      <template v-for="y in 9">
+        <template v-for="x in 9">
+          <Square :coordinates="{ x, y }" />
+        </template>
       </template>
+
+      <!-- Pieces -->
+      <Piece
+        v-for="piece of board.pieces.values()"
+        :key="piece.id"
+        :piece="piece"
+      />
     </div>
   </div>
 </template>
@@ -14,17 +23,23 @@
   import board from '@/api/board'
 
   import Square from '@/components/Square.vue'
+  import Piece from '@/components/Piece.vue'
 
   export default defineComponent({
     name: 'Board',
 
     components: {
+      Piece,
       Square,
     },
 
     setup() {
       onMounted(() => {
         board.generate()
+
+        setTimeout(() => {
+          board.getPieceAt({ x: 1, y: 1 })?.setCoordinates({ x: 5, y: 5 })
+        }, 3000)
       })
 
       return {

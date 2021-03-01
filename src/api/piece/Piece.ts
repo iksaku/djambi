@@ -1,30 +1,36 @@
-import { Player } from '@/api/player'
+import { Player, PlayerTextColors } from '@/api/player'
 import board from '@/api/board'
+import { Coordinates, ValidateCoordinates } from '@/api/coordinates'
 
 export abstract class Piece {
   public isAlive: boolean = true
 
+  public static pieceCount: number = 0
   public readonly id: number
 
-  public static pieceCount: number = 0
+  // @ts-ignore
+  private _coordinates: Coordinates
 
-  public constructor(public readonly owner: Player) {
+  public constructor(public readonly owner: Player, coordinates: Coordinates) {
     this.id = ++Piece.pieceCount
+    this.setCoordinates(coordinates)
   }
 
-  public get component(): string {
-    return `piece-${this.constructor.name.toLowerCase()}`
+  public get type(): string {
+    return this.constructor.name
   }
 
   public get color(): string {
-    const colors = {
-      Green: 'text-green-500',
-      Yellow: 'text-yellow-500',
-      Red: 'text-red-500',
-      Blue: 'text-blue-500',
-    } as const
+    return PlayerTextColors[this.owner]
+  }
 
-    return colors[this.owner] ?? undefined
+  public get coordinates(): Readonly<Coordinates> {
+    return this._coordinates
+  }
+
+  public setCoordinates(coordinates: Coordinates): void {
+    ValidateCoordinates(coordinates)
+    this._coordinates = coordinates
   }
 
   public get isCorpse(): boolean {

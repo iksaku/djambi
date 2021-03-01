@@ -1,22 +1,24 @@
 <template>
   <div
     class="relative w-full border border-black overflow-hidden"
-    :class="isMaze ? 'bg-black' : 'bg-gray-300'"
-    style="padding-bottom: 100%"
-  >
-    <div
-      class="absolute inset-0 flex items-center justify-center transform duration-1000 ease-in"
-    >
-      <component v-if="piece" :is="piece.component" :class="piece.color" />
-    </div>
-  </div>
+    :class="bgColor"
+    :style="{
+      paddingBottom: '100%',
+      gridColumnStart: coordinates.x,
+      gridRowStart: coordinates.y,
+    }"
+  />
 </template>
 
 <script lang="ts">
   import { computed, defineComponent, PropType } from 'vue'
+  import {
+    Coordinates,
+    isSameCoordinate,
+    MazeCoordinates,
+  } from '@/api/coordinates'
   import board from '@/api/board'
-  import { Coordinates, MazeCoordinates } from '@/api/coordinates'
-  import { Piece } from '@/api/piece'
+  import { PlayerBackgroundColors } from '@/api/player'
 
   export default defineComponent({
     name: 'Square',
@@ -29,18 +31,21 @@
     },
 
     setup({ coordinates }) {
-      const isMaze = computed(
-        (): boolean =>
-          coordinates.x === MazeCoordinates.x &&
-          coordinates.y === MazeCoordinates.y
-      )
-      const piece = computed((): Piece | undefined =>
-        board.getPieceAt(coordinates)
-      )
+      const bgColor = computed((): string => {
+        // It isn't the central square
+        if (!isSameCoordinate(coordinates, MazeCoordinates))
+          return 'bg-gray-300'
+
+        const playerInPower = board.playerInPower
+
+        // There's no Player in Power
+        if (!playerInPower) return 'bg-black'
+
+        return PlayerBackgroundColors[playerInPower]
+      })
 
       return {
-        isMaze,
-        piece,
+        bgColor,
       }
     },
   })
