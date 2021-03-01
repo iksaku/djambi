@@ -4,7 +4,13 @@ import board from '@/api/board'
 export abstract class Piece {
   public isAlive: boolean = true
 
-  public constructor(public readonly owner: Player) {}
+  public readonly id: number
+
+  public static pieceCount: number = 0
+
+  public constructor(public readonly owner: Player) {
+    this.id = ++Piece.pieceCount
+  }
 
   public get component(): string {
     return `piece-${this.constructor.name.toLowerCase()}`
