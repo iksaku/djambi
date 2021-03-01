@@ -13,29 +13,22 @@
 </template>
 
 <script lang="ts">
-  import { computed, defineComponent } from 'vue'
+  import { computed, defineComponent, PropType } from 'vue'
   import board from '@/api/board'
-  import { MazeCoordinates } from '@/api/coordinates'
+  import { Coordinates, MazeCoordinates } from '@/api/coordinates'
   import { Piece } from '@/api/piece'
-
-  type Props = {
-    coordinates: {
-      x: number
-      y: number
-    }
-  }
 
   export default defineComponent({
     name: 'Square',
 
     props: {
       coordinates: {
-        type: Object,
+        type: Object as PropType<Coordinates>,
         required: true,
       },
-    } as Props,
+    },
 
-    setup({ coordinates }: Props) {
+    setup({ coordinates }) {
       const isMaze = computed(
         (): boolean =>
           coordinates.x === MazeCoordinates.x &&
