@@ -11,8 +11,8 @@ export enum PlayerId {
 export const PlayerOrder: Readonly<PlayerId[]> = [
   PlayerId.Green,
   PlayerId.Yellow,
-  PlayerId.Red,
   PlayerId.Blue,
+  PlayerId.Red,
 ]
 
 export const PlayerTextColors: Record<PlayerId, string> = {

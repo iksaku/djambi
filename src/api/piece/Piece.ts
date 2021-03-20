@@ -1,34 +1,52 @@
 import { Player, PlayerTextColors } from '@/api/player'
 import board from '@/api/game/board'
-import { Coordinates, ValidateCoordinates } from '@/api/coordinates'
+import { Coordinates } from '@/api/coordinates'
+import { turnHandler } from '@/api/game'
 
 export abstract class Piece {
-  public isAlive: boolean = true
+  private _isAlive: boolean = true
 
   public static pieceCount: number = 0
   public readonly id: number
 
-  // @ts-ignore
-  private _coordinates: Coordinates
-
-  public constructor(public readonly owner: Player, coordinates: Coordinates) {
+  public constructor(
+    public readonly owner: Player,
+    public coordinates: Coordinates
+  ) {
     this.id = ++Piece.pieceCount
-    this.setCoordinates(coordinates)
   }
 
   public abstract get type(): string
 
+  public get isAlive(): boolean {
+    return this._isAlive
+  }
+
+  public set isAlive(value: boolean) {
+    this._isAlive = value
+  }
+
   public get color(): string {
-    return PlayerTextColors[this.owner.id]
+    if (this.isCorpse) return 'text-black'
+
+    if (this.temporalOwner?.isAlive)
+      return PlayerTextColors[this.temporalOwner.id]
+
+    return 'text-gray-500 opacity-50'
   }
 
-  public get coordinates(): Readonly<Coordinates> {
-    return this._coordinates
+  public get shouldHighlight(): boolean {
+    return (
+      this.isAlive &&
+      (this.temporalOwner?.isAlive ?? false) &&
+      turnHandler.isTurnOf(this.temporalOwner!)
+    )
   }
 
-  public setCoordinates(coordinates: Coordinates): void {
-    ValidateCoordinates(coordinates)
-    this._coordinates = coordinates
+  public get temporalOwner(): Player | undefined {
+    if (!this.owner.isAlive) return board.powerPlayer
+
+    return this.owner
   }
 
   public get isCorpse(): boolean {
@@ -55,17 +73,9 @@ export abstract class Piece {
     // If dead, deny
     if (!this.isAlive) return false
 
-    // If owner is requesting, allow
-    if (this.owner.isAlive && player.is(this.owner)) return true
-
-    return (
-      // If owner is alive, but not requesting, deny
-      !this.owner.isAlive &&
-      // If owner is not alive, and there's no power player, deny
-      board.hasPowerPlayer &&
-      // If owner is not alive, and power player is requesting, allow
-      player.is(board.playerInPower!)
-      // Otherwise, deny
-    )
+    // Temporal Owner returns either the real Owner or the Power Player if real Owner is not alive.
+    // If temporal owner is requesting, allow
+    // Otherwise, deny
+    return this.temporalOwner?.is(player) ?? false
   }
 }

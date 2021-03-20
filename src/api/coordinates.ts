@@ -1,23 +1,33 @@
-export type Coordinates = {
+export type PositionObject = {
   x: number
   y: number
 }
 
-export const MazeCoordinates: Coordinates = {
-  x: 5,
-  y: 5,
-} as const
+export class Coordinates {
+  protected constructor(public readonly x: number, public readonly y: number) {}
 
-export function isSameCoordinate(a: Coordinates, b: Coordinates): boolean {
-  return a.x === b.x && a.y === b.y
-}
-
-export function ValidateCoordinates(coordinate: Coordinates): void {
-  if (coordinate.x < 1 || coordinate.x > 9) {
-    throw 'Invalid X coordinate'
+  public static from({ x, y }: PositionObject): Coordinates {
+    return this.make(x, y)
   }
 
-  if (coordinate.y < 1 || coordinate.y > 9) {
-    throw 'Invalid Y coordinate'
+  public static make(x: number, y: number): Coordinates {
+    this.validate(x, y)
+    return new Coordinates(x, y)
+  }
+
+  protected static validate(x: number, y: number): void {
+    if (x < 1 || x > 9) {
+      throw 'Invalid X coordinate'
+    }
+
+    if (y < 1 || y > 9) {
+      throw 'Invalid Y coordinate'
+    }
+  }
+
+  public is(coordinate: Coordinates): boolean {
+    return coordinate.x === this.x && coordinate.y === this.y
   }
 }
+
+export const MazeCoordinates: Coordinates = Coordinates.make(5, 5)

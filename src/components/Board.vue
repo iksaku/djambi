@@ -4,7 +4,7 @@
       <!-- Board Squares -->
       <template v-for="y in 9">
         <template v-for="x in 9">
-          <Square :coordinates="{ x, y }" />
+          <Square :position="{ x, y }" />
         </template>
       </template>
 
@@ -20,10 +20,11 @@
 
 <script lang="ts">
   import { defineComponent, onMounted } from 'vue'
-  import { board } from '@/api/game'
+  import { board, turnHandler } from '@/api/game'
 
   import Square from '@/components/Square.vue'
   import Piece from '@/components/Piece.vue'
+  import { Coordinates, MazeCoordinates } from '@/api/coordinates'
 
   export default defineComponent({
     name: 'Board',
@@ -36,6 +37,23 @@
     setup() {
       onMounted(() => {
         board.generate()
+
+        // setTimeout(() => {
+        //   let yellowPieceCoordinates = Coordinates.make(9, 1)
+        //   let yellowPiece = board.pieceAt(yellowPieceCoordinates)!
+        //
+        //   yellowPiece.coordinates = MazeCoordinates
+        //
+        //   setTimeout(() => {
+        //     yellowPiece.coordinates = yellowPieceCoordinates
+        //
+        //     let piece = board.pieceAt(Coordinates.make(1, 9))!
+        //
+        //     piece.coordinates = MazeCoordinates
+        //   }, 3000)
+        // }, 3000)
+        //
+        // setInterval(() => turnHandler.nextTurn(), 5000)
       })
 
       return {

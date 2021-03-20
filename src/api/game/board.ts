@@ -1,16 +1,12 @@
 import { reactive } from 'vue'
+import { Coordinates, MazeCoordinates } from '@/api/coordinates'
 import {
-  Coordinates,
-  isSameCoordinate,
-  MazeCoordinates,
-} from '@/api/coordinates'
-import {
-  Piece,
   Assassin,
   Chief,
   Diplomat,
   Militant,
   Necromobile,
+  Piece,
   Reporter,
 } from '@/api/piece'
 import { Player, PlayerId, PlayerOrder } from '@/api/player'
@@ -37,10 +33,16 @@ class Board {
 
     // Loop through the 4 available players
     for (let playerId of PlayerOrder) {
+      const player = new Player(playerId)
+
+      if (player.id === PlayerId.Red || player.id === PlayerId.Green) {
+        player.isAlive = false
+      }
+
       const inUpperRegion =
-        playerId === PlayerId.Green || playerId === PlayerId.Yellow
+        player.id === PlayerId.Green || player.id === PlayerId.Yellow
       const inLeftRegion =
-        playerId === PlayerId.Green || playerId === PlayerId.Red
+        player.id === PlayerId.Green || player.id === PlayerId.Red
 
       let xStart = inLeftRegion ? 1 : 9
       let yStart = inUpperRegion ? 1 : 9
@@ -57,27 +59,27 @@ class Board {
 
           if (!pieceType) continue
 
-          let piece = new pieceType(new Player(playerId), { x, y })
+          let piece = new pieceType(player, Coordinates.make(x, y))
           this.pieces.set(piece.id, piece)
         }
       }
     }
   }
 
-  public getPieceAt(coordinates: Coordinates): Piece | undefined {
+  public pieceAt(coordinates: Coordinates): Piece | undefined {
     for (let piece of this.pieces.values()) {
-      if (isSameCoordinate(piece.coordinates, coordinates)) {
+      if (piece.coordinates.is(coordinates)) {
         return piece
       }
     }
   }
 
-  public get playerInPower(): Player | undefined {
-    return this.getPieceAt(MazeCoordinates)?.owner
+  public get powerPlayer(): Player | undefined {
+    return this.pieceAt(MazeCoordinates)?.owner
   }
 
   public get hasPowerPlayer(): boolean {
-    return this.playerInPower !== undefined
+    return this.powerPlayer !== undefined
   }
 }
 

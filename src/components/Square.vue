@@ -4,8 +4,8 @@
     :class="bgColor"
     :style="{
       paddingBottom: '100%',
-      gridColumnStart: coordinates.x,
-      gridRowStart: coordinates.y,
+      gridColumnStart: position.x,
+      gridRowStart: position.y,
     }"
   />
 </template>
@@ -14,8 +14,8 @@
   import { computed, defineComponent, PropType } from 'vue'
   import {
     Coordinates,
-    isSameCoordinate,
     MazeCoordinates,
+    PositionObject,
   } from '@/api/coordinates'
   import { board, turnHandler } from '@/api/game'
   import { PlayerBackgroundColors } from '@/api/player'
@@ -24,30 +24,34 @@
     name: 'Square',
 
     props: {
-      coordinates: {
-        type: Object as PropType<Coordinates>,
+      position: {
+        type: Object as PropType<PositionObject>,
         required: true,
       },
     },
 
-    setup({ coordinates }) {
+    setup({ position }) {
+      const coordinates = Coordinates.from(position)
+
       const bgColor = computed((): string => {
+        const squarePiece = board.pieceAt(coordinates)
+
         // Highlight current player's pieces
-        if (board.getPieceAt(coordinates)?.owner === turnHandler.current)
-          return 'bg-purple-500'
+        if (
+          /*squarePiece?.temporalOwner?.isAlive &&
+          turnHandler.isTurnOf(squarePiece.temporalOwner)*/
+          squarePiece?.shouldHighlight
+        )
+          return 'bg-pink-400'
 
-        // If it isn't the central square, just dye gray
-        if (!isSameCoordinate(coordinates, MazeCoordinates))
-          return 'bg-gray-300'
+        // If it isn't the central (maze) square, just dye gray
+        if (!coordinates.is(MazeCoordinates)) return 'bg-gray-300'
 
-        // Get the current player in Power
-        const playerInPower = board.playerInPower
+        // If there's no Player in Power, or is not alive, dye in black
+        if (!board.powerPlayer?.isAlive) return 'bg-gray-700'
 
-        // If there's no Player in Power, dye in black
-        if (!playerInPower) return 'bg-black'
-
-        // If there's a player in Power, dye in its own color
-        return PlayerBackgroundColors[playerInPower]
+        // If there's an alive Power Player, dye in its own color
+        return PlayerBackgroundColors[board.powerPlayer!.id]
       })
 
       return {

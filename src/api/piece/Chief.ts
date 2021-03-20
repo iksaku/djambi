@@ -9,5 +9,7 @@ export class Chief extends Piece {
     return true
   }
 
-  // TODO: Can be used by player?
+  public get isAlive(): boolean {
+    return this.owner.isAlive
+  }
 }
