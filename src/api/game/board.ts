@@ -13,12 +13,12 @@ import {
   Necromobile,
   Reporter,
 } from '@/api/piece'
-import { Player } from '@/api/player'
+import { Player, PlayerId, PlayerOrder } from '@/api/player'
 
 class Board {
   public readonly pieces: Map<number, Piece>
 
-  constructor() {
+  public constructor() {
     this.pieces = reactive(new Map())
   }
 
@@ -36,9 +36,11 @@ class Board {
     ]
 
     // Loop through the 4 available players
-    for (let p of Object.values(Player)) {
-      const inUpperRegion = p === Player.Green || p === Player.Yellow
-      const inLeftRegion = p === Player.Green || p === Player.Red
+    for (let playerId of PlayerOrder) {
+      const inUpperRegion =
+        playerId === PlayerId.Green || playerId === PlayerId.Yellow
+      const inLeftRegion =
+        playerId === PlayerId.Green || playerId === PlayerId.Red
 
       let xStart = inLeftRegion ? 1 : 9
       let yStart = inUpperRegion ? 1 : 9
@@ -55,7 +57,7 @@ class Board {
 
           if (!pieceType) continue
 
-          let piece = new pieceType(p, { x, y })
+          let piece = new pieceType(new Player(playerId), { x, y })
           this.pieces.set(piece.id, piece)
         }
       }
@@ -72,6 +74,10 @@ class Board {
 
   public get playerInPower(): Player | undefined {
     return this.getPieceAt(MazeCoordinates)?.owner
+  }
+
+  public get hasPowerPlayer(): boolean {
+    return this.playerInPower !== undefined
   }
 }
 

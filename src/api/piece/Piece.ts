@@ -1,5 +1,5 @@
 import { Player, PlayerTextColors } from '@/api/player'
-import board from '@/api/board'
+import board from '@/api/game/board'
 import { Coordinates, ValidateCoordinates } from '@/api/coordinates'
 
 export abstract class Piece {
@@ -21,7 +21,7 @@ export abstract class Piece {
   }
 
   public get color(): string {
-    return PlayerTextColors[this.owner]
+    return PlayerTextColors[this.owner.id]
   }
 
   public get coordinates(): Readonly<Coordinates> {
@@ -54,9 +54,20 @@ export abstract class Piece {
   }
 
   public canBeUsedByPlayer(player: Player): boolean {
+    // If dead, deny
+    if (!this.isAlive) return false
+
+    // If owner is requesting, allow
+    if (this.owner.isAlive && player.is(this.owner)) return true
+
     return (
-      (this.isAlive && player === this.owner) ||
-      (this.isCorpse && player === board.playerInPower)
+      // If owner is alive, but not requesting, deny
+      !this.owner.isAlive &&
+      // If owner is not alive, and there's no power player, deny
+      board.hasPowerPlayer &&
+      // If owner is not alive, and power player is requesting, allow
+      player.is(board.playerInPower!)
+      // Otherwise, deny
     )
   }
 }

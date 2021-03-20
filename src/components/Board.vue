@@ -20,7 +20,7 @@
 
 <script lang="ts">
   import { defineComponent, onMounted } from 'vue'
-  import board from '@/api/board'
+  import { board } from '@/api/game'
 
   import Square from '@/components/Square.vue'
   import Piece from '@/components/Piece.vue'
@@ -36,10 +36,6 @@
     setup() {
       onMounted(() => {
         board.generate()
-
-        setTimeout(() => {
-          board.getPieceAt({ x: 1, y: 1 })?.setCoordinates({ x: 5, y: 5 })
-        }, 3000)
       })
 
       return {
