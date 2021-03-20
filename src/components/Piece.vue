@@ -39,12 +39,6 @@
       Necromobile,
       Reporter,
     },
-
-    setup({ piece }) {
-      return {
-        piece,
-      }
-    },
   })
 </script>
 

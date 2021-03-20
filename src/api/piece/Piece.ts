@@ -16,9 +16,7 @@ export abstract class Piece {
     this.setCoordinates(coordinates)
   }
 
-  public get type(): string {
-    return this.constructor.name
-  }
+  public abstract get type(): string
 
   public get color(): string {
     return PlayerTextColors[this.owner.id]

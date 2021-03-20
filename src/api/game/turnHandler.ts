@@ -1,6 +1,6 @@
 import { PlayerId, PlayerOrder } from '@/api/player'
 import board from '@/api/game/board'
-import { Ref, ref, watch } from 'vue'
+import { Ref, ref } from 'vue'
 
 type TurnPlayer = PlayerId | 'Power'
 
