@@ -127,7 +127,35 @@ export class ClickHandler {
       // Move the piece
       piece.coordinates = targetCoordinates
 
-      // TODO: Reporter killing around
+      // Handle Reporter Killing Around when Moving
+      if (piece.type === 'Reporter') {
+        const range = [-1, 0, 1]
+        for (let x of range) {
+          for (let y of range) {
+            let coordinates: Coordinates
+
+            try {
+              coordinates = Coordinates.from({
+                x: targetCoordinates.x + x,
+                y: targetCoordinates.y + y,
+              })
+            } catch {
+              // Invalid Coordinates
+              continue
+            }
+
+            if (targetCoordinates.is(coordinates)) continue
+
+            let targetPiece = board.getPieceAt(coordinates)
+
+            if (!targetPiece?.isAlive) continue
+
+            if (targetPiece.owner.is(piece.owner)) continue
+
+            targetPiece.isAlive = false
+          }
+        }
+      }
 
       TurnHandler.nextTurn()
       return
