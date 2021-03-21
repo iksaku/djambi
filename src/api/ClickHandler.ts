@@ -218,6 +218,7 @@ export class ClickHandler {
         piece.penalizedTurns = 3
       }
     }
+
     // Handle Free Piece Relocation
     else {
       alert(

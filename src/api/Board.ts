@@ -50,6 +50,10 @@ class Board {
 
       this.players.set(player.id, player)
 
+      if (player.id === PlayerId.Red) {
+        player.isAlive = false
+      }
+
       const inUpperRegion =
         player.id === PlayerId.Green || player.id === PlayerId.Yellow
       const inLeftRegion =
