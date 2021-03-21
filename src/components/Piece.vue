@@ -1,7 +1,11 @@
 <template>
   <div
     @click.stop="onClick"
-    class="relative w-full h-0 overflow-hidden z-10 transition-transform transform duration-75 ease-in-out"
+    class="relative w-full h-0 overflow-hidden transition-transform transform duration-75 ease-in-out"
+    :class="{
+      'z-10': piece.isCorpse,
+      'z-20': piece.isAlive,
+    }"
     :style="{
       paddingBottom: '100%',
       gridColumnStart: piece.coordinates.x,

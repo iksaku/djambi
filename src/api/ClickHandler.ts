@@ -127,6 +127,8 @@ export class ClickHandler {
       // Move the piece
       piece.coordinates = targetCoordinates
       TurnHandler.nextTurn()
+
+      // TODO: If Reporter, kill surrounding pieces
       return
     }
 
@@ -165,20 +167,25 @@ export class ClickHandler {
       targetPiece.isAlive = false
     }
 
-    alert(
-      'Por favor selecciona un lugar a donde deseas mover de la pieza que atacaste.'
-    )
+    if (piece.type !== 'Assassin') {
+      alert(
+        'Por favor selecciona un lugar a donde deseas mover de la pieza que atacaste.'
+      )
 
-    ClickHandler._selectedPiece.value = targetPiece
-    ClickHandler.highlightEmptySquares.value = true
-    ClickHandler.queue = ClickHandler.handleFreePieceRelocation
+      ClickHandler._selectedPiece.value = targetPiece
+      ClickHandler.highlightEmptySquares.value = true
+      ClickHandler.queue = ClickHandler.handleFreePieceRelocation
+    }
+
+    // Handle Killing by Assassin
+    if (piece.type === 'Assassin') {
+      targetPiece.coordinates = piece.coordinates
+    }
 
     piece.coordinates = targetCoordinates
 
     if (ClickHandler.queue === ClickHandler.handlePieceMovement) {
-      try {
-        ClickHandler.verifyMazeIntegrity()
-      } catch {
+      if (!ClickHandler.verifyMazeIntegrity) {
         ClickHandler.queue = ClickHandler.handleMazeExit
         return
       }
@@ -187,13 +194,13 @@ export class ClickHandler {
     }
   }
 
-  private static handleFreePieceRelocation(coordinates: Coordinates): void {
+  private static verifyPieceRelocation(coordinates: Coordinates): boolean {
     if (board.hasPieceAt(coordinates)) {
       alert(
         'Movimiento Inválido.' +
           '\n\n* Este espacio se encuentra ocupado, por favor selecciona un espacio vacío.'
       )
-      return
+      return false
     }
 
     if (coordinates.is(Maze) && !ClickHandler.selectedPiece!.canEnterMaze) {
@@ -201,14 +208,18 @@ export class ClickHandler {
         'Movimiento Inválido.' +
           '\n\n* Esta pieza no puede ser colocada en el laberinto.'
       )
-      return
+      return false
     }
+
+    return true
+  }
+
+  private static handleFreePieceRelocation(coordinates: Coordinates): void {
+    if (!ClickHandler.verifyPieceRelocation(coordinates)) return
 
     ClickHandler.selectedPiece!.coordinates = coordinates
 
-    try {
-      ClickHandler.verifyMazeIntegrity()
-    } catch {
+    if (!ClickHandler.verifyMazeIntegrity) {
       ClickHandler.queue = ClickHandler.handleMazeExit
       return
     }
@@ -216,12 +227,12 @@ export class ClickHandler {
     TurnHandler.nextTurn()
   }
 
-  private static verifyMazeIntegrity(): void {
+  private static get verifyMazeIntegrity(): boolean {
     const pieceAtMaze = board.getPieceAt(Maze)
 
-    if (!pieceAtMaze) return
+    if (!pieceAtMaze) return true
 
-    if (pieceAtMaze.canEnterMaze) return
+    if (pieceAtMaze.canEnterMaze) return true
 
     alert(
       'Antes de finalizar tu turno, por favor mueve la pieza del laberinto a otro espacio vacío.'
@@ -230,17 +241,11 @@ export class ClickHandler {
     ClickHandler._selectedPiece.value = pieceAtMaze
     ClickHandler.highlightEmptySquares.value = true
 
-    throw 'Piece in Maze cannot stay there.'
+    return false
   }
 
   private static handleMazeExit(coordinates: Coordinates): void {
-    if (board.hasPieceAt(coordinates)) {
-      alert(
-        'Movimiento Inválido.' +
-          '\n\n* Este espacio se encuentra ocupado, por favor selecciona un espacio vacío.'
-      )
-      return
-    }
+    if (!ClickHandler.verifyPieceRelocation(coordinates)) return
 
     ClickHandler.selectedPiece!.coordinates = coordinates
 
