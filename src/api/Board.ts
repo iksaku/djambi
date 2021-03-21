@@ -1,5 +1,5 @@
-import { reactive } from 'vue'
-import { Coordinates, Maze } from '@/api/coordinates'
+import { reactive, ref } from 'vue'
+import { Coordinates, Maze } from '@/api/Coordinates'
 import {
   Assassin,
   Chief,
@@ -10,18 +10,30 @@ import {
   Reporter,
 } from '@/api/piece'
 import { Player } from '@/api/Player'
-import { PlayerId, PlayerOrder } from '@/api/helper'
+import { PlayerId, PlayerOrder } from '@/api/Helper'
+import { TurnHandler } from '@/api/TurnHandler'
+import { ClickHandler } from '@/api/ClickHandler'
 
 class Board {
   public readonly pieces: Map<number, Piece>
+  public readonly players: Map<PlayerId, Player>
+  public isRunning = ref(true)
 
   public constructor() {
     this.pieces = reactive(new Map())
+    this.players = reactive(new Map())
   }
 
   public generate() {
+    this.isRunning.value = true
+
+    // Reset TurnHandler
+    TurnHandler.reset()
+    ClickHandler.reset()
+
     // Clear Piece List
     this.pieces.clear()
+    this.players.clear()
 
     const pieceDistribution = [
       // First Row
@@ -35,6 +47,12 @@ class Board {
     // Loop through the 4 available players
     for (let playerId of PlayerOrder) {
       const player = new Player(playerId)
+
+      this.players.set(player.id, player)
+
+      if (player.id === PlayerId.Yellow) {
+        player.isAlive = false
+      }
 
       const inUpperRegion =
         player.id === PlayerId.Green || player.id === PlayerId.Yellow
@@ -63,7 +81,7 @@ class Board {
     }
   }
 
-  public pieceAt(coordinates: Coordinates): Piece | undefined {
+  public getPieceAt(coordinates: Coordinates): Piece | undefined {
     for (let piece of this.pieces.values()) {
       if (piece.coordinates.is(coordinates)) {
         return piece
@@ -72,15 +90,19 @@ class Board {
   }
 
   public hasPieceAt(coordinates: Coordinates): boolean {
-    return this.pieceAt(coordinates) !== undefined
+    return this.getPieceAt(coordinates) !== undefined
   }
 
-  public get powerPlayer(): Player | undefined {
-    return this.pieceAt(Maze)?.owner
+  public getPlayerById(id: PlayerId): Player {
+    return this.players.get(id)!
+  }
+
+  public get getPowerPlayer(): Player | undefined {
+    return this.getPieceAt(Maze)?.owner
   }
 
   public get hasPowerPlayer(): boolean {
-    return this.powerPlayer !== undefined
+    return this.getPowerPlayer !== undefined
   }
 }
 

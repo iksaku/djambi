@@ -20,7 +20,7 @@
 
 <script lang="ts">
   import { defineComponent, onMounted } from 'vue'
-  import { board } from '@/api/board'
+  import { board } from '@/api/Board'
 
   import Square from '@/components/Square.vue'
   import Piece from '@/components/Piece.vue'

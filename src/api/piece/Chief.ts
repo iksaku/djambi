@@ -12,4 +12,8 @@ export class Chief extends Piece {
   public get isAlive(): boolean {
     return this.owner.isAlive
   }
+
+  public set isAlive(value: boolean) {
+    this.owner.isAlive = false
+  }
 }

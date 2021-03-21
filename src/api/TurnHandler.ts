@@ -1,8 +1,8 @@
 import { Player } from '@/api/Player'
-import { board } from '@/api/board'
+import { board } from '@/api/Board'
 import { ref } from 'vue'
 import { ClickHandler } from '@/api/ClickHandler'
-import { PlayerId, PlayerOrder } from '@/api/helper'
+import { PlayerId, PlayerOrder } from '@/api/Helper'
 
 type TurnPlayer = PlayerId | 'PowerPlayer'
 
@@ -12,49 +12,43 @@ export const TurnOrder: Readonly<TurnPlayer[]> = [
 ] as const
 
 export class TurnHandler {
-  private static turn = ref<TurnPlayer>(PlayerId.Green)
+  private static turn = ref<TurnPlayer>(TurnOrder[0])
 
   public static get current(): TurnPlayer {
     return TurnHandler.turn.value
   }
 
-  public static isTurnOf(player: Player): boolean {
-    return (
-      // If it's current player's ID turn, allow
-      player.id === this.current ||
-      // Otherwise, if player is the Power Player and its Power Player's turn, allow
-      (this.current === 'PowerPlayer' &&
-        (board.powerPlayer?.is(player) ?? false))
-    )
+  public static reset(): void {
+    TurnHandler.turn.value = TurnOrder[0]
   }
 
   public static nextTurn(): void {
     TurnHandler.onTurnEnd()
 
-    // Thank God for ES6's Labeled Blocks...
-    // This block will run independently, and will exit when hitting any `return` statement,
-    // then, it'll continue executing the rest of the function.
-    // In this case, it'll follow the next flow:
-    //    onTurnEnd() -> `TurnHandle` Block -> onTurnStart()
-    TurnHandle: {
-      // TODO: Turn Skip dead players
-      // TODO: End game when there's only one player alive
+    let next: TurnPlayer = TurnHandler.current
 
-      let next: number = TurnOrder.indexOf(TurnHandler.turn.value) + 1
+    while (true) {
+      let nextIndex: number = TurnOrder.indexOf(next) + 1
 
-      if (!(next in TurnOrder)) {
-        TurnHandler.turn.value = TurnOrder[0]
-        break TurnHandle
+      next = TurnOrder[nextIndex] ?? PlayerId.Green
+
+      if (next === 'PowerPlayer' && !board.hasPowerPlayer) {
+        // Skip to search for the next ID
+        continue
       }
 
-      let nextPlayer = TurnOrder[next]
+      let player: Player
 
-      if (nextPlayer === 'PowerPlayer' && !board.hasPowerPlayer) {
-        nextPlayer = TurnOrder[0]
+      if (next === 'PowerPlayer' && board.hasPowerPlayer) {
+        player = board.getPowerPlayer!
       }
 
-      TurnHandler.turn.value = nextPlayer
+      player ??= board.getPlayerById(next as PlayerId)
+
+      if (player.isAlive) break
     }
+
+    TurnHandler.turn.value = next
 
     TurnHandler.onTurnStart()
   }
@@ -63,5 +57,27 @@ export class TurnHandler {
     ClickHandler.reset()
   }
 
-  private static onTurnEnd(): void {}
+  private static onTurnEnd(): void {
+    let alivePlayers = Array.from(board.players.values()).filter(
+      (player: Player) => player.isAlive
+    )
+
+    if (alivePlayers.length <= 1) {
+      board.isRunning.value = false
+
+      if (alivePlayers.length < 1) {
+        alert('Todos los jugadores han perdido. ¡Empate!')
+      } else {
+        alert(`¡El jugador ${alivePlayers[0].name} ha sido el ganador!`)
+      }
+
+      let startNewGame = confirm('¿Desea iniciar una nueva partida?')
+
+      if (startNewGame) {
+        board.generate()
+      }
+
+      return
+    }
+  }
 }

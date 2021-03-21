@@ -1,8 +1,8 @@
 import { Player } from '@/api/Player'
-import { board } from '@/api/board'
-import { Coordinates } from '@/api/coordinates'
+import { board } from '@/api/Board'
+import { Coordinates } from '@/api/Coordinates'
 import { ClickHandler } from '../ClickHandler'
-import { PlayerTextColors } from '@/api/helper'
+import { PlayerTextColors } from '@/api/Helper'
 
 export abstract class Piece {
   private _isAlive: boolean = true
@@ -54,7 +54,7 @@ export abstract class Piece {
   }
 
   public get temporalOwner(): Player | undefined {
-    if (!this.owner.isAlive) return board.powerPlayer
+    if (!this.owner.isAlive) return board.getPowerPlayer
 
     return this.owner
   }

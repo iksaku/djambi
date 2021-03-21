@@ -1,6 +1,6 @@
-import { Coordinates, Maze } from '@/api/coordinates'
+import { Coordinates, Maze } from '@/api/Coordinates'
 import { Piece } from '@/api/piece'
-import { board } from '@/api/board'
+import { board } from '@/api/Board'
 import { ref } from 'vue'
 import { TurnHandler } from '@/api/TurnHandler'
 
@@ -20,11 +20,21 @@ export class ClickHandler {
   }
 
   public static handle(coordinates: Coordinates) {
+    if (!board.isRunning) {
+      let startNewGame = confirm('¿Desea iniciar una nueva partida?')
+
+      if (startNewGame) {
+        board.generate()
+      }
+
+      return
+    }
+
     ClickHandler.queue(coordinates)
   }
 
   private static handlePieceSelection(coordinates: Coordinates): void {
-    const piece = board.pieceAt(coordinates)
+    const piece = board.getPieceAt(coordinates)
 
     if (!piece || piece.isCorpse || !piece.temporalOwner?.inTurn) return
 
@@ -44,7 +54,7 @@ export class ClickHandler {
       return
     }
 
-    let targetPiece = board.pieceAt(targetCoordinates)
+    let targetPiece = board.getPieceAt(targetCoordinates)
 
     if (
       piece.temporalOwner &&
@@ -195,7 +205,7 @@ export class ClickHandler {
   }
 
   private static verifyMazeIntegrity(): void {
-    const pieceAtMaze = board.pieceAt(Maze)
+    const pieceAtMaze = board.getPieceAt(Maze)
 
     if (!pieceAtMaze) return
 

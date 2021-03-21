@@ -13,10 +13,10 @@
 
 <script lang="ts">
   import { computed, defineComponent, PropType } from 'vue'
-  import { Coordinates, Maze, PositionObject } from '@/api/coordinates'
-  import { board } from '@/api/board'
+  import { Coordinates, Maze, PositionObject } from '@/api/Coordinates'
+  import { board } from '@/api/Board'
   import { ClickHandler } from '@/api/ClickHandler'
-  import { PlayerBackgroundColors } from '@/api/helper'
+  import { PlayerBackgroundColors } from '@/api/Helper'
 
   export default defineComponent({
     name: 'Square',
@@ -32,7 +32,7 @@
       const coordinates = Coordinates.from(position)
 
       const bgColor = computed((): string => {
-        const squarePiece = board.pieceAt(coordinates)
+        const squarePiece = board.getPieceAt(coordinates)
 
         // Highlight current player's pieces or empty squares if required
         if (
@@ -45,10 +45,10 @@
         if (!coordinates.is(Maze)) return 'bg-gray-300'
 
         // If there's no Player in Power, or is not alive, dye in black
-        if (!board.powerPlayer?.isAlive) return 'bg-gray-700'
+        if (!board.getPowerPlayer?.isAlive) return 'bg-gray-700'
 
         // If there's an alive Power Player, dye in its own color
-        return PlayerBackgroundColors[board.powerPlayer!.id]
+        return PlayerBackgroundColors[board.getPowerPlayer!.id]
       })
 
       return {
