@@ -238,7 +238,9 @@ export class ClickHandler {
     ) {
       Array.from(board.pieces.values())
         // Get all troops that belong to the killed chief
-        .filter((p: Piece) => p.owner.is(targetPiece!.owner))
+        .filter(
+          (p: Piece) => p.owner.is(targetPiece!.owner) && !(p instanceof Chief)
+        )
         .forEach((p: Piece) => {
           // Convert from dead's chief to killer's.
           p.owner = piece!.owner
