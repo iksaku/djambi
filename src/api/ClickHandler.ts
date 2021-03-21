@@ -1,5 +1,5 @@
 import { Coordinates, Maze } from '@/api/Coordinates'
-import { Piece } from '@/api/piece'
+import { Assassin, Chief, Piece, Reporter } from '@/api/piece'
 import { board } from '@/api/Board'
 import { ref } from 'vue'
 import { TurnHandler } from '@/api/TurnHandler'
@@ -36,7 +36,17 @@ export class ClickHandler {
   private static handlePieceSelection(coordinates: Coordinates): void {
     const piece = board.getPieceAt(coordinates)
 
+    // Don't select corpses nor pieces not belonging to the player in turn
     if (!piece || piece.isCorpse || !piece.temporalOwner?.inTurn) return
+
+    // Don't select penalized pieces
+    if (piece instanceof Assassin && piece.isPenalized) {
+      alert(
+        `Esta pieza se encuentra penalizada y no podrá ser utilizada durante este turno.`
+      )
+
+      return
+    }
 
     ClickHandler.queue = ClickHandler.handlePieceMovement
     ClickHandler._selectedPiece.value = piece
@@ -128,7 +138,7 @@ export class ClickHandler {
       piece.coordinates = targetCoordinates
 
       // Handle Reporter Killing Around when Moving
-      if (piece.type === 'Reporter') {
+      if (piece instanceof Reporter) {
         const range = [-1, 0, 1]
         for (let x of range) {
           for (let y of range) {
@@ -197,8 +207,16 @@ export class ClickHandler {
     }
 
     // Handle Corpse Relocation when killed by Assassin
-    if (piece.type === 'Assassin') {
+    if (piece instanceof Assassin) {
       targetPiece.coordinates = piece.coordinates
+
+      if (targetPiece.isCorpse && targetPiece instanceof Assassin) {
+        alert(
+          'Tu Asesino obtendrá una penalización por haber matado a otro asesino.' +
+            'Esta penalización te impedirá utilizarlo por los próximos 2 turnos.'
+        )
+        piece.penalizedTurns = 3
+      }
     }
     // Handle Free Piece Relocation
     else {
@@ -214,8 +232,8 @@ export class ClickHandler {
     // Handle troops conversion to killing enemy's side
     if (
       targetPiece.isCorpse &&
-      piece.type === 'Chief' &&
-      targetPiece.type === 'Chief'
+      piece instanceof Chief &&
+      targetPiece instanceof Chief
     ) {
       Array.from(board.pieces.values())
         // Get all troops that belong to the killed chief

@@ -72,10 +72,6 @@ export abstract class Piece {
     return true
   }
 
-  public get canMoveAlivePiece(): boolean {
-    return false
-  }
-
   public get canInteractWithCorpse(): boolean {
     return false
   }

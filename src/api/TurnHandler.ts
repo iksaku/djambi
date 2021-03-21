@@ -3,6 +3,7 @@ import { board } from '@/api/Board'
 import { ref } from 'vue'
 import { ClickHandler } from '@/api/ClickHandler'
 import { PlayerId, PlayerOrder } from '@/api/Helper'
+import { Assassin, Piece } from './piece'
 
 type TurnPlayer = PlayerId | 'PowerPlayer'
 
@@ -53,7 +54,26 @@ export class TurnHandler {
     TurnHandler.onTurnStart()
   }
 
-  private static onTurnStart(): void {}
+  private static onTurnStart(): void {
+    let player: Player
+
+    if (TurnHandler.current === 'PowerPlayer' && board.hasPowerPlayer) {
+      player = board.getPowerPlayer!
+    }
+
+    player ??= board.getPlayerById(TurnHandler.current as PlayerId)
+
+    // Remove a Penalization on turn Loop
+    let assassin: Assassin | undefined = Array.from(board.pieces.values()).find(
+      (p: Piece) => p.owner.is(player) && p instanceof Assassin
+    ) as Assassin
+
+    if (assassin && assassin.penalizedTurns > 0) {
+      --assassin.penalizedTurns
+
+      console.log(assassin.penalizedTurns)
+    }
+  }
 
   private static onTurnEnd(): void {
     let alivePlayers = Array.from(board.players.values()).filter(

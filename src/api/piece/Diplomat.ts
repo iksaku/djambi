@@ -8,8 +8,4 @@ export class Diplomat extends Piece {
   public get canKillPiece(): boolean {
     return false
   }
-
-  public get canMoveAlivePiece(): boolean {
-    return true
-  }
 }
