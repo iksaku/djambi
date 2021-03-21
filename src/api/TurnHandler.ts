@@ -53,9 +53,7 @@ export class TurnHandler {
     TurnHandler.onTurnStart()
   }
 
-  private static onTurnStart(): void {
-    ClickHandler.reset()
-  }
+  private static onTurnStart(): void {}
 
   private static onTurnEnd(): void {
     let alivePlayers = Array.from(board.players.values()).filter(
@@ -76,8 +74,8 @@ export class TurnHandler {
       if (startNewGame) {
         board.generate()
       }
-
-      return
     }
+
+    ClickHandler.reset()
   }
 }

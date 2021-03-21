@@ -126,9 +126,10 @@ export class ClickHandler {
 
       // Move the piece
       piece.coordinates = targetCoordinates
-      TurnHandler.nextTurn()
 
-      // TODO: If Reporter, kill surrounding pieces
+      // TODO: Reporter killing around
+
+      TurnHandler.nextTurn()
       return
     }
 
@@ -167,7 +168,12 @@ export class ClickHandler {
       targetPiece.isAlive = false
     }
 
-    if (piece.type !== 'Assassin') {
+    // Handle Corpse Relocation when killed by Assassin
+    if (piece.type === 'Assassin') {
+      targetPiece.coordinates = piece.coordinates
+    }
+    // Handle Free Piece Relocation
+    else {
       alert(
         'Por favor selecciona un lugar a donde deseas mover de la pieza que atacaste.'
       )
@@ -177,9 +183,19 @@ export class ClickHandler {
       ClickHandler.queue = ClickHandler.handleFreePieceRelocation
     }
 
-    // Handle Killing by Assassin
-    if (piece.type === 'Assassin') {
-      targetPiece.coordinates = piece.coordinates
+    // Handle troops conversion to killing enemy's side
+    if (
+      targetPiece.isCorpse &&
+      piece.type === 'Chief' &&
+      targetPiece.type === 'Chief'
+    ) {
+      Array.from(board.pieces.values())
+        // Get all troops that belong to the killed chief
+        .filter((p: Piece) => p.owner.is(targetPiece!.owner))
+        .forEach((p: Piece) => {
+          // Convert from dead's chief to killer's.
+          p.owner = piece!.owner
+        })
     }
 
     piece.coordinates = targetCoordinates

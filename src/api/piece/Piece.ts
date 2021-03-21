@@ -10,10 +10,7 @@ export abstract class Piece {
   public static pieceCount: number = 0
   public readonly id: number
 
-  public constructor(
-    public readonly owner: Player,
-    public coordinates: Coordinates
-  ) {
+  public constructor(public owner: Player, public coordinates: Coordinates) {
     this.id = ++Piece.pieceCount
   }
 
