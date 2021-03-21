@@ -6,6 +6,6 @@ export class Militant extends Piece {
   }
 
   public get maxMovementDistance(): number {
-    return 2
+    return 3
   }
 }
