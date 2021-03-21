@@ -1,6 +1,8 @@
-import { Player, PlayerId, PlayerOrder } from '@/api/player'
-import board from '@/api/game/board'
-import { Ref, ref } from 'vue'
+import { Player } from '@/api/Player'
+import { board } from '@/api/board'
+import { ref } from 'vue'
+import { ClickHandler } from '@/api/ClickHandler'
+import { PlayerId, PlayerOrder } from '@/api/helper'
 
 type TurnPlayer = PlayerId | 'PowerPlayer'
 
@@ -9,18 +11,14 @@ export const TurnOrder: Readonly<TurnPlayer[]> = [
   'PowerPlayer',
 ] as const
 
-class TurnHandler {
-  private turn: Ref<TurnPlayer>
+export class TurnHandler {
+  private static turn = ref<TurnPlayer>(PlayerId.Green)
 
-  public constructor() {
-    this.turn = ref<TurnPlayer>(PlayerId.Green)
+  public static get current(): TurnPlayer {
+    return TurnHandler.turn.value
   }
 
-  public get current(): TurnPlayer {
-    return this.turn.value
-  }
-
-  public isTurnOf(player: Player): boolean {
+  public static isTurnOf(player: Player): boolean {
     return (
       // If it's current player's ID turn, allow
       player.id === this.current ||
@@ -30,8 +28,8 @@ class TurnHandler {
     )
   }
 
-  public nextTurn(): void {
-    this.onTurnEnd()
+  public static nextTurn(): void {
+    TurnHandler.onTurnEnd()
 
     // Thank God for ES6's Labeled Blocks...
     // This block will run independently, and will exit when hitting any `return` statement,
@@ -39,10 +37,13 @@ class TurnHandler {
     // In this case, it'll follow the next flow:
     //    onTurnEnd() -> `TurnHandle` Block -> onTurnStart()
     TurnHandle: {
-      let next: number = TurnOrder.indexOf(this.turn.value) + 1
+      // TODO: Turn Skip dead players
+      // TODO: End game when there's only one player alive
+
+      let next: number = TurnOrder.indexOf(TurnHandler.turn.value) + 1
 
       if (!(next in TurnOrder)) {
-        this.turn.value = TurnOrder[0]
+        TurnHandler.turn.value = TurnOrder[0]
         break TurnHandle
       }
 
@@ -52,23 +53,15 @@ class TurnHandler {
         nextPlayer = TurnOrder[0]
       }
 
-      this.turn.value = nextPlayer
+      TurnHandler.turn.value = nextPlayer
     }
 
-    this.onTurnStart()
+    TurnHandler.onTurnStart()
   }
 
-  private onTurnStart(): void {
-    // TODO
-    console.log(`Starting Turn for '${this.current}' Player`)
+  private static onTurnStart(): void {
+    ClickHandler.reset()
   }
 
-  private onTurnEnd(): void {
-    // TODO
-    console.log(`Ending Turn for '${this.current}' Player`)
-  }
+  private static onTurnEnd(): void {}
 }
-
-const turnHandler = new TurnHandler()
-
-export default turnHandler

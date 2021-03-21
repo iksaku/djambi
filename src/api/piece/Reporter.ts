@@ -5,7 +5,11 @@ export class Reporter extends Piece {
     return 'Reporter'
   }
 
-  public get canKillDirectly(): boolean {
+  public get canInteractWithAlivePiece(): boolean {
+    return false
+  }
+
+  public get canKillPiece(): boolean {
     return false
   }
 }

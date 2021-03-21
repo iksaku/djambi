@@ -5,11 +5,11 @@ export class Necromobile extends Piece {
     return 'Necromobile'
   }
 
-  public get canKillDirectly(): boolean {
+  public get canInteractWithAlivePiece(): boolean {
     return false
   }
 
-  public get canMoveCorpse(): boolean {
+  public get canInteractWithCorpse(): boolean {
     return true
   }
 }

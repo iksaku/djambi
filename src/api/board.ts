@@ -1,5 +1,5 @@
 import { reactive } from 'vue'
-import { Coordinates, MazeCoordinates } from '@/api/coordinates'
+import { Coordinates, Maze } from '@/api/coordinates'
 import {
   Assassin,
   Chief,
@@ -9,7 +9,8 @@ import {
   Piece,
   Reporter,
 } from '@/api/piece'
-import { Player, PlayerId, PlayerOrder } from '@/api/player'
+import { Player } from '@/api/Player'
+import { PlayerId, PlayerOrder } from '@/api/helper'
 
 class Board {
   public readonly pieces: Map<number, Piece>
@@ -34,10 +35,6 @@ class Board {
     // Loop through the 4 available players
     for (let playerId of PlayerOrder) {
       const player = new Player(playerId)
-
-      if (player.id === PlayerId.Red || player.id === PlayerId.Green) {
-        player.isAlive = false
-      }
 
       const inUpperRegion =
         player.id === PlayerId.Green || player.id === PlayerId.Yellow
@@ -74,8 +71,12 @@ class Board {
     }
   }
 
+  public hasPieceAt(coordinates: Coordinates): boolean {
+    return this.pieceAt(coordinates) !== undefined
+  }
+
   public get powerPlayer(): Player | undefined {
-    return this.pieceAt(MazeCoordinates)?.owner
+    return this.pieceAt(Maze)?.owner
   }
 
   public get hasPowerPlayer(): boolean {
@@ -83,6 +84,4 @@ class Board {
   }
 }
 
-const board = new Board()
-
-export default board
+export const board = new Board()

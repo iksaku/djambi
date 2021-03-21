@@ -1,5 +1,6 @@
 <template>
   <div
+    @click.stop="onClick"
     class="relative w-full border border-black overflow-hidden"
     :class="bgColor"
     :style="{
@@ -12,13 +13,10 @@
 
 <script lang="ts">
   import { computed, defineComponent, PropType } from 'vue'
-  import {
-    Coordinates,
-    MazeCoordinates,
-    PositionObject,
-  } from '@/api/coordinates'
-  import { board, turnHandler } from '@/api/game'
-  import { PlayerBackgroundColors } from '@/api/player'
+  import { Coordinates, Maze, PositionObject } from '@/api/coordinates'
+  import { board } from '@/api/board'
+  import { ClickHandler } from '@/api/ClickHandler'
+  import { PlayerBackgroundColors } from '@/api/helper'
 
   export default defineComponent({
     name: 'Square',
@@ -36,16 +34,15 @@
       const bgColor = computed((): string => {
         const squarePiece = board.pieceAt(coordinates)
 
-        // Highlight current player's pieces
+        // Highlight current player's pieces or empty squares if required
         if (
-          /*squarePiece?.temporalOwner?.isAlive &&
-          turnHandler.isTurnOf(squarePiece.temporalOwner)*/
+          (!squarePiece && ClickHandler.highlightEmptySquares.value) ||
           squarePiece?.shouldHighlight
         )
           return 'bg-pink-400'
 
         // If it isn't the central (maze) square, just dye gray
-        if (!coordinates.is(MazeCoordinates)) return 'bg-gray-300'
+        if (!coordinates.is(Maze)) return 'bg-gray-300'
 
         // If there's no Player in Power, or is not alive, dye in black
         if (!board.powerPlayer?.isAlive) return 'bg-gray-700'
@@ -56,6 +53,7 @@
 
       return {
         bgColor,
+        onClick: () => ClickHandler.handle(coordinates),
       }
     },
   })

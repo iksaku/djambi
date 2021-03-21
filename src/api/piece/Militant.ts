@@ -5,6 +5,10 @@ export class Militant extends Piece {
     return 'Militant'
   }
 
+  public get maxMovementDistance(): number {
+    return 2
+  }
+
   // TODO: Movement
   // TODO: Killing Logic
 }

@@ -30,4 +30,4 @@ export class Coordinates {
   }
 }
 
-export const MazeCoordinates: Coordinates = Coordinates.make(5, 5)
+export const Maze: Coordinates = Coordinates.make(5, 5)

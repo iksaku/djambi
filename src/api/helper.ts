@@ -1,6 +1,3 @@
-import { Piece } from '@/api/piece'
-import { board } from '@/api/game'
-
 export enum PlayerId {
   Green = 'Green',
   Yellow = 'Yellow',
@@ -28,19 +25,3 @@ export const PlayerBackgroundColors: Record<PlayerId, string> = {
   Red: 'bg-red-800',
   Blue: 'bg-blue-800',
 } as const
-
-export class Player {
-  public isAlive: boolean = true
-
-  public constructor(public readonly id: PlayerId) {}
-
-  public is(player: Player): boolean {
-    return player.id === this.id
-  }
-
-  public get pieces(): Piece[] {
-    return Array.from(board.pieces.values()).filter((piece) =>
-      piece.owner.is(this)
-    )
-  }
-}

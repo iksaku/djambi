@@ -1,7 +1,8 @@
-import { Player, PlayerTextColors } from '@/api/player'
-import board from '@/api/game/board'
+import { Player } from '@/api/Player'
+import { board } from '@/api/board'
 import { Coordinates } from '@/api/coordinates'
-import { turnHandler } from '@/api/game'
+import { ClickHandler } from '../ClickHandler'
+import { PlayerTextColors } from '@/api/helper'
 
 export abstract class Piece {
   private _isAlive: boolean = true
@@ -37,10 +38,19 @@ export abstract class Piece {
 
   public get shouldHighlight(): boolean {
     return (
+      // Don't highlight if corpse
       this.isAlive &&
+      // Don't highlight if there's a selected piece other than this
+      // If there's no piece selected in ClickHandler, then continue with this
+      (ClickHandler.selectedPiece?.is(this) ?? true) &&
+      // Highlight if Real or Temporal Owner's turn
       (this.temporalOwner?.isAlive ?? false) &&
-      turnHandler.isTurnOf(this.temporalOwner!)
+      (this.temporalOwner?.inTurn ?? false)
     )
+  }
+
+  public is(piece: Piece): boolean {
+    return this.id === piece.id
   }
 
   public get temporalOwner(): Player | undefined {
@@ -53,29 +63,27 @@ export abstract class Piece {
     return !this.isAlive
   }
 
-  public get canKillDirectly(): boolean {
+  public get maxMovementDistance(): number {
+    return Infinity
+  }
+
+  public get canInteractWithAlivePiece(): boolean {
     return true
   }
 
-  public get canMovePiece(): boolean {
+  public get canKillPiece(): boolean {
+    return true
+  }
+
+  public get canMoveAlivePiece(): boolean {
     return false
   }
 
-  public get canMoveCorpse(): boolean {
+  public get canInteractWithCorpse(): boolean {
     return false
   }
 
   public get canEnterMaze(): boolean {
     return !this.isAlive
-  }
-
-  public canBeUsedByPlayer(player: Player): boolean {
-    // If dead, deny
-    if (!this.isAlive) return false
-
-    // Temporal Owner returns either the real Owner or the Power Player if real Owner is not alive.
-    // If temporal owner is requesting, allow
-    // Otherwise, deny
-    return this.temporalOwner?.is(player) ?? false
   }
 }

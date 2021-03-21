@@ -1,5 +1,6 @@
 <template>
   <div
+    @click.stop="onClick"
     class="relative w-full h-0 overflow-hidden z-10 transition-transform transform duration-75 ease-in-out"
     :style="{
       paddingBottom: '100%',
@@ -21,6 +22,7 @@
   import Militant from './pieces/Militant.vue'
   import Necromobile from './pieces/Necromobile.vue'
   import Reporter from './pieces/Reporter.vue'
+  import { ClickHandler } from '@/api/ClickHandler'
 
   export default defineComponent({
     name: 'Piece',
@@ -38,6 +40,12 @@
       Militant,
       Necromobile,
       Reporter,
+    },
+
+    setup({ piece }) {
+      return {
+        onClick: () => ClickHandler.handle(piece.coordinates),
+      }
     },
   })
 </script>

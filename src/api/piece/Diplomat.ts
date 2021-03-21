@@ -5,11 +5,11 @@ export class Diplomat extends Piece {
     return 'Diplomat'
   }
 
-  public get canKillDirectly(): boolean {
+  public get canKillPiece(): boolean {
     return false
   }
 
-  public get canMovePiece(): boolean {
+  public get canMoveAlivePiece(): boolean {
     return true
   }
 }
