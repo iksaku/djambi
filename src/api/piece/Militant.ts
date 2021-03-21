@@ -8,7 +8,4 @@ export class Militant extends Piece {
   public get maxMovementDistance(): number {
     return 2
   }
-
-  // TODO: Movement
-  // TODO: Killing Logic
 }

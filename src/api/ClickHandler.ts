@@ -131,7 +131,7 @@ export class ClickHandler {
     }
 
     // Handle Corpse interaction
-    if (targetPiece.isCorpse && !piece.canInteractWithCorpse) {
+    if (targetPiece.isCorpse) {
       if (!piece.canInteractWithCorpse) {
         alert(
           'Movimiento Inválido.' +
@@ -142,13 +142,17 @@ export class ClickHandler {
 
       alert('Por favor selecciona un lugar a donde deseas mover el cadáver.')
 
+      ClickHandler._selectedPiece.value = targetPiece
       ClickHandler.highlightEmptySquares.value = true
       ClickHandler.queue = ClickHandler.handleFreePieceRelocation
+
+      piece.coordinates = targetCoordinates
+
       return
     }
 
     // Handle Alive Piece Interaction
-    if (!targetPiece.canInteractWithAlivePiece) {
+    if (!piece.canInteractWithAlivePiece) {
       alert(
         'Movimiento Inválido.' +
           '\n\n* Esta pieza no puede interactuar con piezas vivas.'
@@ -157,7 +161,7 @@ export class ClickHandler {
     }
 
     // Handle Piece Killing
-    if (targetPiece.canKillPiece) {
+    if (piece.canKillPiece) {
       targetPiece.isAlive = false
     }
 
@@ -188,6 +192,14 @@ export class ClickHandler {
       alert(
         'Movimiento Inválido.' +
           '\n\n* Este espacio se encuentra ocupado, por favor selecciona un espacio vacío.'
+      )
+      return
+    }
+
+    if (coordinates.is(Maze) && !ClickHandler.selectedPiece!.canEnterMaze) {
+      alert(
+        'Movimiento Inválido.' +
+          '\n\n* Esta pieza no puede ser colocada en el laberinto.'
       )
       return
     }

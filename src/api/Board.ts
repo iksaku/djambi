@@ -98,7 +98,13 @@ class Board {
   }
 
   public get getPowerPlayer(): Player | undefined {
-    return this.getPieceAt(Maze)?.owner
+    let piece = this.getPieceAt(Maze)
+
+    if (piece?.type !== 'Chief' || !piece?.isAlive) {
+      return
+    }
+
+    return piece?.owner
   }
 
   public get hasPowerPlayer(): boolean {
