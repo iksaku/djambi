@@ -68,6 +68,7 @@ export class ClickHandler {
 
     if (
       piece.temporalOwner &&
+      targetPiece?.isAlive &&
       targetPiece?.temporalOwner?.is(piece.temporalOwner)
     ) {
       ClickHandler.handlePieceSelection(targetCoordinates)
